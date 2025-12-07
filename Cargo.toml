@@ -1,0 +1,22 @@
+[package]
+name = "s3-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aws-config = { version = "1", default-features = false, features = [
+    "behavior-version-latest",
+] }
+aws-sdk-s3 = { version = "1", default-features = false }
+polars = { version = "0.45", default-features = false, features = [
+    "lazy",
+    "csv",
+    "fmt_no_tty",
+] }
+wstd = { version = "^0.6" }
+wstd-aws = { version = "^0.6" }
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
