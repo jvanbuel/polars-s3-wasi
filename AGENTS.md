@@ -1,0 +1,1 @@
+Do not pipe commands to `| tail` unless you are sure they create superlong output.
