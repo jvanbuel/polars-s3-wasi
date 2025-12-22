@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.100"
 aws-config = { version = "1", default-features = false, features = [
     "behavior-version-latest",
 ] }
@@ -13,6 +14,7 @@ polars = { version = "0.45", default-features = false, features = [
     "csv",
     "fmt_no_tty",
 ] }
+spin-sdk = { version = "^5.0" }
 wstd = { version = "^0.6" }
 wstd-aws = { version = "^0.6" }
 

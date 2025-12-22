@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: polars-s3-wasi
+spec:
+  template:
+    spec:
+      runtimeClassName: wasmtime-spin-v2
+      containers:
+      - name: polars-s3-wasi
+        image: ttl.sh/polars-s3-wasi:24h
+        imagePullPolicy: Always
+        args: ["/"]
+        envFrom:
+        - secretRef:
+            name: aws-credentials
+        resources:
+          limits:
+            cpu: 1
+            memory: 1G
+          requests:
+            cpu: 10m
+            memory: 10M
+      restartPolicy: Never
+  backoffLimit: 1

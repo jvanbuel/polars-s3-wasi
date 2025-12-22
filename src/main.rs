@@ -4,6 +4,23 @@ use std::env;
 use std::error::Error;
 use std::io::Cursor;
 
+// We don't use this, we use trigger-command instead.
+// Keep it for now because we don't know whether trigger-command runs on spinkube.
+// use spin_sdk::http::{IntoResponse, Request, Response};
+// use spin_sdk::http_component;
+// 
+// /// A simple Spin HTTP component.
+// #[http_component]
+// fn handle_s3_wasm(req: Request) -> anyhow::Result<impl IntoResponse> {
+//     println!("Handling request to {:?}", req.header("spin-full-url"));
+//     Ok(Response::builder()
+//         .status(200)
+//         .header("content-type", "text/plain")
+//         .body("Hello World!")
+//         .build())
+// }
+// 
+
 #[wstd::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Get configuration from environment variables

@@ -1,5 +1,7 @@
 target
 .claude
+.spin/logs
 
 # secrets
 .env
+spin.toml

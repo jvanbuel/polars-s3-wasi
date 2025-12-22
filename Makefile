@@ -56,3 +56,8 @@ run: build
 clean:
 	cargo clean
 	@echo "Clean complete"
+
+job-recreate:
+	kubectl delete jobs.batch polars-s3-wasi; kubectl apply -f k8s-job.yaml
+
+
