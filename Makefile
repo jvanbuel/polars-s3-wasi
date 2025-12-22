@@ -6,6 +6,8 @@ WASM_FILE := target/$(TARGET)/release/$(BINARY_NAME).wasm
 
 # Try to find wasmtime in common locations
 WASMTIME := $(shell which wasmtime 2>/dev/null || echo /opt/homebrew/opt/wasmtime/bin/wasmtime)
+# And spin
+SPIN := $(shell which spin 2>/dev/null || echo /opt/homebrew/opt/spin/bin/spin)
 
 # Default S3 configuration (can be overridden)
 S3_BUCKET ?= wasi-s3-dm
@@ -28,6 +30,10 @@ setup:
 	@echo "Checking for wasmtime..."
 	@test -f $(WASMTIME) || (echo "Please install wasmtime: https://wasmtime.dev/" && exit 1)
 	@echo "Found wasmtime at $(WASMTIME)"
+	@echo "Checking for spin..."
+	@test -f $(SPIN) || (echo "Please install spin: https://spinframework.dev/v3/install" && exit 1)
+	@echo "Found spin at $(SPIN)"
+	@echo "Setup complete."
 
 build:
 	@echo "Building for $(TARGET)..."
