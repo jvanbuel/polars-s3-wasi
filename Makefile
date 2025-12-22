@@ -34,7 +34,7 @@ help:
 	@echo "  OCI_IMAGE  - OCI image reference (default: ttl.sh/polars-s3-wasi:24h)"
 
 setup:
-	@echo "Installing wasip2 target..."
+	@echo "Installing" $(TARGET) "target..."
 	rustup target add $(TARGET)
 	@echo "Checking for wasmtime..."
 	@test -f $(WASMTIME) || (echo "Please install wasmtime: https://wasmtime.dev/" && exit 1)
@@ -75,6 +75,9 @@ spin: build
 publish: build
 	@echo "Publishing Spin app to $(OCI_IMAGE)..."
 	$(SPIN) registry push $(OCI_IMAGE)
+
+recreate-job:
+	kubectl delete jobs.batch polars-s3-wasi; kubectl apply -f k8s-job.yaml
 
 clean:
 	cargo clean

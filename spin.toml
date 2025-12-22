@@ -20,14 +20,6 @@ aws_session_token = { default = "" }
 [component.s3-wasm]
 source = "target/wasm32-wasip2/release/s3-wasm.wasm"
 allowed_outbound_hosts = ["https://*.amazonaws.com", "https://*.s3.amazonaws.com"]
-inherit_env = [
-    "S3_BUCKET",
-    "S3_KEY",
-    "AWS_REGION",
-    "AWS_ACCESS_KEY_ID",
-    "AWS_SECRET_ACCESS_KEY",
-    "AWS_SESSION_TOKEN"
-]
 
 # [component.s3-wasm.environment]
 # S3_BUCKET = "{{ s3_bucket }}"
