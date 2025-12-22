@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: polars-s3-wasi
+spec:
+  schedule: "0 * * * *" # Every hour; adjust as needed
+  suspend: true # Set to false to enable scheduled runs
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          # Tell K8s to use the Spin runtime, not Docker/containerd
+          runtimeClassName: wasmtime-spin-v2
+          containers:
+            - name: polars-s3-wasi
+              # Point to your OCI-packaged Spin app
+              image: ttl.sh/polars-s3-wasi:24h
+              imagePullPolicy: Always
+              command: ["/"]
+              env:
+                - name: S3_BUCKET
+                  value: "wasi-s3-dm"
+                - name: S3_KEY
+                  value: "data.csv"
+              envFrom:
+                - secretRef:
+                    name: aws-credentials
+          restartPolicy: Never

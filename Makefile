@@ -1,4 +1,4 @@
-.PHONY: setup build run clean help
+.PHONY: setup build run spin clean help publish k8s-secret k8s-deploy k8s-logs
 
 TARGET := wasm32-wasip2
 BINARY_NAME := s3-wasm
@@ -13,16 +13,25 @@ SPIN := $(shell which spin 2>/dev/null || echo /opt/homebrew/opt/spin/bin/spin)
 S3_BUCKET ?= wasi-s3-dm
 S3_KEY ?= data.csv
 
+# OCI registry configuration
+OCI_IMAGE ?= ttl.sh/polars-s3-wasi:24h
+
 help:
 	@echo "Available targets:"
-	@echo "  setup  - Install wasip2 target and wasmtime"
-	@echo "  build  - Build the WASM binary"
-	@echo "  run    - Run the WASM binary with wasmtime"
-	@echo "  clean  - Clean build artifacts"
+	@echo "  setup      - Install wasip2 target and wasmtime"
+	@echo "  build      - Build the WASM binary"
+	@echo "  run        - Run the WASM binary with wasmtime"
+	@echo "  spin       - Run the WASM binary with Spin"
+	@echo "  publish    - Build and push OCI image to registry"
+	@echo "  clean      - Clean build artifacts"
+	@echo "  k8s-secret - Create/update AWS credentials secret in K8s"
+	@echo "  k8s-deploy - Deploy the job to Kubernetes"
+	@echo "  k8s-logs   - Fetch logs from the job"
 	@echo ""
 	@echo "Environment variables:"
-	@echo "  S3_BUCKET - S3 bucket name (default: my-bucket)"
-	@echo "  S3_KEY    - S3 object key (default: data.csv)"
+	@echo "  S3_BUCKET  - S3 bucket name (default: wasi-s3-dm)"
+	@echo "  S3_KEY     - S3 object key (default: data.csv)"
+	@echo "  OCI_IMAGE  - OCI image reference (default: ttl.sh/polars-s3-wasi:24h)"
 
 setup:
 	@echo "Installing wasip2 target..."
@@ -53,11 +62,20 @@ run: build
 		--dir=. \
 		$(WASM_FILE)
 
+spin: build
+	@echo "Running WASM component with Spin..."
+	$(SPIN) up \
+		--variable s3_bucket="$(S3_BUCKET)" \
+		--variable s3_key="$(S3_KEY)" \
+		--variable aws_region="$(AWS_REGION)" \
+		--variable aws_access_key_id="$(AWS_ACCESS_KEY_ID)" \
+		--variable aws_secret_access_key="$(AWS_SECRET_ACCESS_KEY)" \
+		--variable aws_session_token="$(AWS_SESSION_TOKEN)"
+
+publish: build
+	@echo "Publishing Spin app to $(OCI_IMAGE)..."
+	$(SPIN) registry push $(OCI_IMAGE)
+
 clean:
 	cargo clean
 	@echo "Clean complete"
-
-job-recreate:
-	kubectl delete jobs.batch polars-s3-wasi; kubectl apply -f k8s-job.yaml
-
-

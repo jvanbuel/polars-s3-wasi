@@ -1,0 +1,18 @@
+shape: (240, 2)
+┌────────────────┬───────┐
+│ Country        ┆ Count │
+│ ---            ┆ ---   │
+│ str            ┆ u32   │
+╞════════════════╪═══════╡
+│ Liechtenstein  ┆ 12    │
+│ Gabon          ┆ 10    │
+│ Reunion        ┆ 9     │
+│ Bangladesh     ┆ 9     │
+│ China          ┆ 9     │
+│ …              ┆ …     │
+│ Zambia         ┆ 1     │
+│ Norfolk Island ┆ 1     │
+│ Saint Martin   ┆ 1     │
+│ Poland         ┆ 1     │
+│ Spain          ┆ 1     │
+└────────────────┴───────┘

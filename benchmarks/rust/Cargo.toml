@@ -1,0 +1,18 @@
+[package]
+name = "s3-polars-benchmark"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aws-config = { version = "1", features = ["behavior-version-latest"] }
+aws-sdk-s3 = "1"
+polars = { version = "0.45", default-features = false, features = [
+    "lazy",
+    "csv",
+    "fmt_no_tty",
+] }
+tokio = { version = "1", features = ["full"] }
+
+[profile.release]
+opt-level = 3
+lto = true

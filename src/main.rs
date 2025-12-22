@@ -1,4 +1,5 @@
 use aws_config::BehaviorVersion;
+use aws_sdk_s3::config::{Credentials, Region};
 use polars::prelude::*;
 use std::env;
 use std::error::Error;
@@ -24,13 +25,29 @@ use std::io::Cursor;
 #[wstd::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     // Get configuration from environment variables
-    let bucket_name = env::var("S3_BUCKET")?;
-    let object_key = env::var("S3_KEY")?;
+    let bucket_name = env::var("SPIN_CONFIG_S3_BUCKET")?;
+    let object_key = env::var("SPIN_CONFIG_S3_KEY")?;
+    let region = env::var("SPIN_CONFIG_AWS_REGION")?;
+    let access_key_id = env::var("SPIN_CONFIG_AWS_ACCESS_KEY_ID")?;
+    let secret_access_key = env::var("SPIN_CONFIG_AWS_SECRET_ACCESS_KEY")?;
+    let session_token = env::var("SPIN_CONFIG_AWS_SESSION_TOKEN")
+        .ok()
+        .filter(|s| !s.is_empty());
 
-    // Load configuration from environment variables (AWS_ACCESS_KEY_ID, etc.)
+    // Load configuration with explicit credentials from environment variables
+    let credentials = Credentials::new(
+        &access_key_id,
+        &secret_access_key,
+        session_token,
+        None,
+        "environment",
+    );
+
     let sdk_config = aws_config::defaults(BehaviorVersion::latest())
         .http_client(wstd_aws::http_client())
         .sleep_impl(wstd_aws::sleep_impl())
+        .region(Region::new(region))
+        .credentials_provider(credentials)
         .load()
         .await;
 

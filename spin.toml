@@ -1,0 +1,42 @@
+spin_manifest_version = 2
+
+[application]
+name = "s3-wasm"
+version = "0.1.0"
+description = "Polars S3 data processing in WASM"
+authors = ["jvanbuel"]
+
+[[trigger.command]]
+component = "s3-wasm"
+
+[variables]
+s3_bucket = { required = true }
+s3_key = { required = true }
+aws_region = { required = true }
+aws_access_key_id = { required = true }
+aws_secret_access_key = { required = true }
+aws_session_token = { default = "" }
+
+[component.s3-wasm]
+source = "target/wasm32-wasip2/release/s3-wasm.wasm"
+allowed_outbound_hosts = ["https://*.amazonaws.com", "https://*.s3.amazonaws.com"]
+inherit_env = [
+    "S3_BUCKET",
+    "S3_KEY",
+    "AWS_REGION",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+    "AWS_SESSION_TOKEN"
+]
+
+# [component.s3-wasm.environment]
+# S3_BUCKET = "{{ s3_bucket }}"
+# S3_KEY = "{{ s3_key }}"
+# AWS_REGION = "{{ aws_region }}"
+# AWS_ACCESS_KEY_ID = "{{ aws_access_key_id }}"
+# AWS_SECRET_ACCESS_KEY = "{{ aws_secret_access_key }}"
+# AWS_SESSION_TOKEN = "{{ aws_session_token }}"
+
+[component.s3-wasm.build]
+command = "cargo build --release --target wasm32-wasip2"
+watch = ["src/**/*.rs", "Cargo.toml"]

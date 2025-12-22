@@ -5,3 +5,4 @@ target
 # secrets
 .env
 spin.toml
+runtime-config.toml
