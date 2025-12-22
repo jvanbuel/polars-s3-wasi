@@ -48,6 +48,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
         )
         .collect()?;
 
+    // Non-lazy version, should we every need it:
+    // let country_counts = df
+    // .group_by(["Country"])?
+    // .select(["Country"]) // Ensures we have the key
+    // .count()?
+    // .rename("Country_count", "Count".into())? // .count() creates a default name
+    // .sort(
+    //     ["Count"],
+    //     SortMultipleOptions::default().with_order_descending(true),
+    // )?;
+
     println!("{}", country_counts);
 
     Ok(())
