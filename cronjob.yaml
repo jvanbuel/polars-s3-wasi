@@ -10,7 +10,7 @@ spec:
       template:
         spec:
           # Tell K8s to use the Spin runtime, not Docker/containerd
-          runtimeClassName: wasmtime-spin-v2
+          runtimeClassName: crun
           containers:
             - name: polars-s3-wasi
               # Point to your OCI-packaged Spin app

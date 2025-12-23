@@ -77,7 +77,12 @@ publish: build
 	$(SPIN) registry push $(OCI_IMAGE)
 
 recreate-job:
-	kubectl delete jobs.batch polars-s3-wasi; kubectl apply -f k8s-job.yaml
+	kubectl delete jobs.batch polars-s3-wasi --ignore-not-found; kubectl apply -f k8s-job.yaml
+	kubectl delete cronjob polars-s3-wasi --ignore-not-found; kubectl apply -f cronjob.yaml
+
+k8s-deploy: publish recreate-job
+	kubectl apply -f runtimeclass.yaml
+
 
 clean:
 	cargo clean
