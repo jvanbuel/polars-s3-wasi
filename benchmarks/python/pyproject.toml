@@ -1,0 +1,9 @@
+[project]
+name = "s3-polars-benchmark"
+version = "0.1.0"
+description = "Benchmark: Read CSV from S3 and process with Polars"
+requires-python = ">=3.10"
+dependencies = [
+    "polars>=1.0.0",
+    "boto3>=1.35.0",
+]
