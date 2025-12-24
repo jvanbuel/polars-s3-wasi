@@ -1,9 +1,18 @@
 .PHONY: all benchmark wasmtime python rust clean help build compile
 
+# Host architecture, Apple or Linux
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	HOST_ARCH := "aarch64-apple-darwin"
+else ifeq ($(UNAME_S),Linux)
+	HOST_ARCH := "x86_64-unknown-linux-gnu"
+else
+	$(error Unsupported host architecture: $(UNAME_S))
+endif
 # Paths
 WASM_FILE := ../../target/wasm32-wasip2/release/s3-wasm.wasm
 CWASM_FILE := ../../target/wasm32-wasip2/release/s3-wasm.cwasm
-RUST_BINARY := ./target/aarch64-apple-darwin/release/s3-polars-benchmark
+RUST_BINARY := ./target/$(HOST_ARCH)/release/s3-polars-benchmark
 PYTHON_DIR := ../python
 PYTHON_VENV := $(PYTHON_DIR)/.venv
 
@@ -30,6 +39,8 @@ WASMTIME_CMD := $(WASMTIME) run --wasi http \
 	--dir=. --allow-precompiled $(CWASM_FILE)
 PYTHON_CMD := $(PYTHON_VENV)/bin/python $(PYTHON_DIR)/main.py
 RUST_CMD := $(RUST_BINARY)
+# TODO: depends on existence of .env and `docker build -t polars-s3-python .` having been run
+DOCKER_PYTHON_CMD := docker run --env-file=../../.env polars-s3-python:latest
 
 help:
 	@echo "Benchmark targets:"
@@ -62,9 +73,10 @@ benchmark: compile
 	hyperfine \
 		--warmup $(WARMUP) \
 		--runs $(RUNS) \
+		-n "WASM (wasmtime)" "$(WASMTIME_CMD)" \
 		-n "Native Rust" "$(RUST_CMD)" \
 		-n "Python" "$(PYTHON_CMD)" \
-		-n "WASM (wasmtime)" "$(WASMTIME_CMD)"
+		-n "Python (Docker)" "$(DOCKER_PYTHON_CMD)"
 
 wasmtime: compile
 	@test -f $(CWASM_FILE) || (echo "Precompiled WASM not found. Run 'make compile' first." && exit 1)
@@ -78,8 +90,13 @@ rust:
 	@test -f $(RUST_BINARY) || $(MAKE) build
 	hyperfine --warmup $(WARMUP) --runs $(RUNS) -n "Native Rust" "$(RUST_CMD)"
 
+docker-python:
+	$(DOCKER_PYTHON_CMD)
+	hyperfine --warmup $(WARMUP) --runs $(RUNS) -n "Python (Docker)" "$(DOCKER_PYTHON_CMD)"
+
 build:
-	cargo build --release
+	# explicitly build for host architecture, because the parent folder builds for wasm
+	cargo build --release --target $(HOST_ARCH)
 
 clean:
 	cargo clean
